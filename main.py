@@ -1,4 +1,5 @@
 import networkx as nx
+from algorithms.maxFlowImpl import maxFlow
 
 if __name__ != "__main__":
     exit
@@ -25,8 +26,7 @@ costs = [
 G = nx.DiGraph()
 for i in range(len(capacities)):
     for j in range(len(capacities[i])):
-        if capacities[i][j] > 0:
-            G.add_edge(i, j, capacity=capacities[i][j], cost=costs[i][j])
+        G.add_edge(i, j, capacity=capacities[i][j], cost=costs[i][j])
 
 print("Nodes:", list(G.nodes()))
 print("Edges:", list(G.edges(data=True)))

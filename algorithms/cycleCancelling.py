@@ -1,13 +1,14 @@
 import networkx as nx
-import maxFlow 
+from algorithms.maxFlowImpl import maxFlow 
+from typing import Any
 
 def cycleCancelling(graph: nx.DiGraph):
 
     maxFlowGraph = graph.copy()
 
     #memorizing all the nodes with bi > 0 or bi < 0
-    availabilities:list[tuple[Unknown,int]] = []
-    requests:list[tuple[Unknown,int]] = []
+    availabilities:list[tuple[Any,int]] = []
+    requests:list[tuple[Any,int]] = []
 
     for node, data in maxFlowGraph.nodes:
         if data["bValue"] > 0:
@@ -25,3 +26,5 @@ def cycleCancelling(graph: nx.DiGraph):
         maxFlowGraph.add_edge("t",node,capacity=-request, flow = 0, cost = 0)
 
     maxFlowValue, workingGraph = maxFlow(maxFlowGraph,"s","t")
+
+    

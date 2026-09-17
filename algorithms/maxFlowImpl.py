@@ -1,6 +1,6 @@
 import networkx as nx
 
-def augmentPathBFS(graph: nx.DiGraph, s:int) -> list[tuple[int, int]]:
+def augmentPathBFS(graph: nx.DiGraph, s) -> list[tuple[int, int]]:
     nodeLabels = [(-1, -1) for _ in range(graph.number_of_nodes())]
     nodeLabels[s] = (s, -1)
     visited:set[int] = set()
@@ -23,7 +23,7 @@ def augmentPathBFS(graph: nx.DiGraph, s:int) -> list[tuple[int, int]]:
             
     return nodeLabels
 
-def maxFlow(graph: nx.DiGraph, s: int, t: int) -> tuple[int, nx.DiGraph]:
+def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
     workingGraph = graph.copy()
 
     for u, v in workingGraph.edges:
