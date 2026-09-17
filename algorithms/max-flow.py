@@ -23,17 +23,17 @@ def augmentPathBFS(graph: nx.DiGraph, s:int) -> list[tuple[int, int]]:
             
     return nodeLabels
 
-def maxFlow(graph: nx.DiGraph, s: int, t: int):
-    residualGraph = graph.copy()
+def maxFlow(graph: nx.DiGraph, s: int, t: int) -> tuple[int, nx.DiGraph]:
+    workingGraph = graph.copy()
 
-    for u, v in residualGraph.edges:
-        if "flow" not in residualGraph[u][v]:
-            residualGraph[u][v]["flow"] = 0
+    for u, v in workingGraph.edges:
+        if "flow" not in workingGraph[u][v]:
+            workingGraph[u][v]["flow"] = 0
 
     optimalState = False
 
     while not optimalState:
-        nodeLabels = augmentPathBFS(residualGraph,s)
+        nodeLabels = augmentPathBFS(workingGraph,s)
 
         #first predecessor and bottleneck value for augmenting flow
         firstPred, augmFlow = nodeLabels[t]
@@ -45,11 +45,17 @@ def maxFlow(graph: nx.DiGraph, s: int, t: int):
         
         while currNode != s:
             pred, flow = nodeLabels[currNode]
-            residualGraph.edges[pred,currNode]["flow"] = residualGraph.edges[pred,currNode]["flow"] + augmFlow
-            if not residualGraph.has_edge(currNode, pred):
-                residualGraph.add_edge(currNode, pred, capacity=0, flow=0, isResidualEdge = True)
+            workingGraph.edges[pred,currNode]["flow"] = workingGraph.edges[pred,currNode]["flow"] + augmFlow
+            if not workingGraph.has_edge(currNode, pred):
+                workingGraph.add_edge(currNode, pred, capacity=0, flow=0, isResidualEdge = True)
 
-            residualGraph.edges[currNode, pred]["flow"] = residualGraph.edges[currNode, pred]["flow"] - augmFlow
+            workingGraph.edges[currNode, pred]["flow"] = workingGraph.edges[currNode, pred]["flow"] - augmFlow
 
             currNode = pred
+
+    maxFlowValue = 0
+    for u,v,data in workingGraph.in_edges(t, data= True):
+        maxFlowValue+= workingGraph.edges[u,v]["flow"]
+
+    return maxFlowValue, workingGraph
     
