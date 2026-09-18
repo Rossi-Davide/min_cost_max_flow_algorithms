@@ -27,4 +27,21 @@ def cycleCancelling(graph: nx.DiGraph):
 
     maxFlowValue, workingGraph = maxFlow(maxFlowGraph,"s","t")
 
+    expectedFlow = 0
+    #checking flow correctness
+    for node, value in availabilities:
+        expectedFlow += value
+
+    """
+    To have a valid start solution all out edges from
+    source must be saturated. Therefore the max flow value shall be equal to 
+    the sum of all maximum capacities
+    of the outgoing edges from the node s, which is equal to the sum of all bi positive values in the original graph
+    """
+    if maxFlowValue < expectedFlow:
+        return "No acceptable solution found"
+
+    
+    
+
     
