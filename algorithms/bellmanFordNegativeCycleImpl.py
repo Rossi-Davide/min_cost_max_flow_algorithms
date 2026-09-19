@@ -1,7 +1,7 @@
 import networkx as nx
 from typing import Any
 
-def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[tuple[Any,int]]:
+def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[Any]:
 
     nodeLabels: dict[Any, tuple[Any | None, int]] = {
         node: (None, 0) for node in graph.nodes
@@ -23,13 +23,14 @@ def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[tuple[Any,int]]
         return []
 
 
-    negativeLoop:list[tuple[Any,int]] = [(vertex,nodeLabels[vertex][1])]
+    negativeLoop:list[Any] = [vertex]
 
     currNode = nodeLabels[vertex][0]
     while currNode != vertex:
         pred, cost = nodeLabels[currNode]
-        negativeLoop.append((currNode,cost))
+        negativeLoop.append(currNode)
         currNode = pred
 
+    negativeLoop.reverse()
     return negativeLoop
     
