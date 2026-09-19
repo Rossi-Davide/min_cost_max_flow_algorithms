@@ -1,10 +1,12 @@
 import networkx as nx
+from algorithms.bellmanFordNegativeCycleImpl import bellmanFordNegativeCycleDetection
 from algorithms.maxFlowImpl import maxFlow 
 from typing import Any
 
 """
 Builds a residual graph by adding reverse edges 
 and eliminating edges with saturated flow
+Each edge has properties: flow,capacity,isResidualEdge
 """
 def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
@@ -73,9 +75,10 @@ def cycleCancelling(graph: nx.DiGraph):
     if maxFlowValue < expectedFlow:
         return "No acceptable solution found"
 
-
+    #cleaning graph after max flow
     workingGraph.remove_node("s")
     workingGraph.remove_node("t")
+
     residual = buildResidualGraph(workingGraph)
 
     #updating residual graph with cost
@@ -85,6 +88,23 @@ def cycleCancelling(graph: nx.DiGraph):
         else:
             residual[u][v]["cost"] = workingGraph[u][v]["cost"]
 
+    #detect negative cycle
+    negativeLoop: list[tuple[Any,int]] = bellmanFordNegativeCycleDetection(residual)
+
+    #optimal solution reached
+    #TODO: write algorithm output
+    if len(negativeLoop) == 0:
+        return
+
+    #find flow augment value in negative cycle
+
+    #setting initial flow value to the residual capacity in the first edge of the cycle
+    flowValue : int = residual[negativeLoop[0]] [negativeLoop[1]] ["capacity"] - residual[negativeLoop[0]] [negativeLoop[1]] ["flow"]
+
+    for i in range(len(negativeLoop)-1):
+        u = negativeLoop[i]
+        v = negativeLoop[i+1]
+        flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
     
     
 
