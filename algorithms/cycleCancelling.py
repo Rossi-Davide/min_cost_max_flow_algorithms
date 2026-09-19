@@ -36,28 +36,28 @@ def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
 def cycleCancelling(graph: nx.DiGraph):
 
-    maxFlowGraph = graph.copy()
+    workingGraph = graph.copy()
 
     #memorizing all the nodes with bi > 0 or bi < 0
     availabilities:list[tuple[Any,int]] = []
     requests:list[tuple[Any,int]] = []
 
-    for node, data in maxFlowGraph.nodes:
+    for node, data in workingGraph.nodes(data=True):
         if data["bValue"] > 0:
             availabilities.append((node,data["bValue"]))
         elif data["bValue"] < 0:
             requests.append((node,data["bValue"]))
 
     #adding s and t to maxFlow graph
-    maxFlowGraph.add_node("s")
+    workingGraph.add_node("s")
     for node, availability in availabilities:
-        maxFlowGraph.add_edge("s",node,capacity=availability, flow = 0, cost = 0)
+        workingGraph.add_edge("s",node,capacity=availability, flow = 0, cost = 0)
 
-    maxFlowGraph.add_node("t")
-    for node, request in availabilities:
-        maxFlowGraph.add_edge("t",node,capacity=-request, flow = 0, cost = 0)
+    workingGraph.add_node("t")
+    for node, request in requests:
+        workingGraph.add_edge("t",node,capacity=-request, flow = 0, cost = 0)
 
-    maxFlowValue, workingGraph = maxFlow(maxFlowGraph,"s","t")
+    maxFlowValue, workingGraph = maxFlow(workingGraph,"s","t")
 
     expectedFlow = 0
     #checking flow correctness
@@ -73,7 +73,18 @@ def cycleCancelling(graph: nx.DiGraph):
     if maxFlowValue < expectedFlow:
         return "No acceptable solution found"
 
-    
+
+    workingGraph.remove_node("s")
+    workingGraph.remove_node("t")
+    residual = buildResidualGraph(workingGraph)
+
+    #updating residual graph with cost
+    for u,v in residual.edges:
+        if residual[u][v]["isResidualEdge"]:
+            residual[u][v]["cost"] = -workingGraph[v][u]["cost"]
+        else:
+            residual[u][v]["cost"] = workingGraph[u][v]["cost"]
+
     
     
 
