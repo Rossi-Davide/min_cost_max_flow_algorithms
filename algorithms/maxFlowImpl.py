@@ -1,5 +1,7 @@
 import networkx as nx
 
+#TODO: rewrite implementation so that nodeLabels works with no list but rather a dictionary for non integer node keys
+
 def augmentPathBFS(graph: nx.DiGraph, s) -> list[tuple[int, int]]:
     nodeLabels = [(-1, -1) for _ in range(graph.number_of_nodes())]
     nodeLabels[s] = (s, -1)
@@ -29,6 +31,10 @@ def augmentPathBFS(graph: nx.DiGraph, s) -> list[tuple[int, int]]:
             
     return nodeLabels
 
+"""
+Calculates maximum flow from s to t and returns flow graph with flow and capacity for each edge
+Return graph also has reverse edges with isResidualEdge property set to True
+"""
 def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
     #creating a copy of the graph and preparing it for maxFlow algorithm
     workingGraph = graph.copy()
