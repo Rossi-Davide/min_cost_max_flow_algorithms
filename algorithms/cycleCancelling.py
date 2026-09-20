@@ -92,8 +92,8 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
         #detect negative cycle
         negativeLoop: list[Any] = bellmanFordNegativeCycleDetection(residual)
+        negativeLoop.append(negativeLoop[0])
         loopEdges: list[tuple[Any,Any]] = [(negativeLoop[i],negativeLoop[i+1]) for i in range(len(negativeLoop)-1)]
-        loopEdges.append((negativeLoop[len(negativeLoop)-1],negativeLoop[0]))
 
         #optimal solution reached
         if len(negativeLoop) == 0:
@@ -111,5 +111,5 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
             flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
                     
         # augment flow in graph
-        workingGraph = augmentPath(workingGraph,loopEdges,flowValue)
+        workingGraph = augmentPath(workingGraph,negativeLoop,flowValue)
     

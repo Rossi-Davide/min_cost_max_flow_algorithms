@@ -1,4 +1,5 @@
 import networkx as nx
+from augmentPathImpl import augmentPath
 
 #TODO: rewrite implementation so that nodeLabels works with no list but rather a dictionary for non integer node keys
 
@@ -60,21 +61,18 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
             continue
 
         #reversely crossing the augmenting path and updating flow for each edge
-        currNode = t
-        while currNode != s:
-            pred, flow = nodeLabels[currNode]
-            workingGraph.edges[pred,currNode]["flow"] = workingGraph.edges[pred,currNode]["flow"] + augmFlow
+        nodePath = [t]
+        pred, flow = nodeLabels[t]
+        endReverseTraversal = False
+        while not endReverseTraversal:
+            nodePath.append(pred)
+            next_pred, flow = nodeLabels[pred]
+            if pred == next_pred:
+                endReverseTraversal = True
+            pred = next_pred
 
-            #creating reverse edge if non existent
-            if not workingGraph.has_edge(currNode, pred):
-                workingGraph.add_edge(currNode, pred, capacity=0, flow=0, isResidualEdge = True)
-
-            #updating flow on reverse edge
-            workingGraph.edges[currNode, pred]["flow"] = workingGraph.edges[currNode, pred]["flow"] - augmFlow
-
-            #updating current looking node
-            currNode = pred
-
+        nodePath.reverse()
+        workingGraph = augmentPath(workingGraph,nodePath,augmFlow)
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0
     for u,v,data in workingGraph.in_edges(t, data= True):
