@@ -1,6 +1,7 @@
 import networkx as nx
 from algorithms.bellmanFordNegativeCycleImpl import bellmanFordNegativeCycleDetection
 from algorithms.maxFlowImpl import maxFlow 
+from algorithms.augmentPathImpl import augmentPath
 from typing import Any
 
 """
@@ -36,7 +37,7 @@ def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
     return R
 
-def cycleCancelling(graph: nx.DiGraph):
+def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
     workingGraph = graph.copy()
 
@@ -73,39 +74,42 @@ def cycleCancelling(graph: nx.DiGraph):
     of the outgoing edges from the node s, which is equal to the sum of all bi positive values in the original graph
     """
     if maxFlowValue < expectedFlow:
-        return "No acceptable solution found"
+        return None, 0
 
     #cleaning graph after max flow
     workingGraph.remove_node("s")
     workingGraph.remove_node("t")
 
-    residual = buildResidualGraph(workingGraph)
+    while True:
+        residual = buildResidualGraph(workingGraph)
 
-    #updating residual graph with cost
-    for u,v in residual.edges:
-        if residual[u][v]["isResidualEdge"]:
-            residual[u][v]["cost"] = -workingGraph[v][u]["cost"]
-        else:
-            residual[u][v]["cost"] = workingGraph[u][v]["cost"]
+        #updating residual graph with cost
+        for u,v in residual.edges:
+            if residual[u][v]["isResidualEdge"]:
+                residual[u][v]["cost"] = -workingGraph[v][u]["cost"]
+            else:
+                residual[u][v]["cost"] = workingGraph[u][v]["cost"]
 
-    #detect negative cycle
-    negativeLoop: list[tuple[Any,int]] = bellmanFordNegativeCycleDetection(residual)
+        #detect negative cycle
+        negativeLoop: list[Any] = bellmanFordNegativeCycleDetection(residual)
+        loopEdges: list[tuple[Any,Any]] = [(negativeLoop[i],negativeLoop[i+1]) for i in range(len(negativeLoop)-1)]
+        loopEdges.append((negativeLoop[len(negativeLoop)-1],negativeLoop[0]))
 
-    #optimal solution reached
-    #TODO: write algorithm output
-    if len(negativeLoop) == 0:
-        return
+        #optimal solution reached
+        if len(negativeLoop) == 0:
+            totCost = 0
+            for u,v in workingGraph.edges:
+                totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
+            return workingGraph, totCost
 
-    #find flow augment value in negative cycle
+        #find flow augment value in negative cycle
 
-    #setting initial flow value to the residual capacity in the first edge of the cycle
-    flowValue : int = residual[negativeLoop[0]] [negativeLoop[1]] ["capacity"] - residual[negativeLoop[0]] [negativeLoop[1]] ["flow"]
+        #setting initial flow value to the residual capacity in the first edge of the cycle
+        flowValue : int = residual[loopEdges[0][0]] [loopEdges[0][1]] ["capacity"] - residual[loopEdges[0][0]] [loopEdges[0][1]] ["flow"]
 
-    for i in range(len(negativeLoop)-1):
-        u = negativeLoop[i]
-        v = negativeLoop[i+1]
-        flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
-    
-    
-
+        for u,v in loopEdges:
+            flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
+                    
+        # augment flow in graph
+        workingGraph = augmentPath(workingGraph,loopEdges,flowValue)
     
