@@ -1,10 +1,11 @@
 import networkx as nx
 from augmentPathImpl import augmentPath
+from typing import Any
 
 #TODO: rewrite implementation so that nodeLabels works with no list but rather a dictionary for non integer node keys
 
-def augmentPathBFS(graph: nx.DiGraph, s) -> list[tuple[int, int]]:
-    nodeLabels = [(-1, -1) for _ in range(graph.number_of_nodes())]
+def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[int, int]]:
+    nodeLabels = { node: (-1, -1) for node in graph.nodes}
     nodeLabels[s] = (s, -1)
     visited:set[int] = set()
     queue = [s]
