@@ -78,7 +78,7 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0
     for u,v,data in workingGraph.in_edges(t, data= True):
-        if data["isResidualEdge"]:
+        if data.get("isResidualEdge",False):
             continue
         maxFlowValue+= data["flow"]
 
