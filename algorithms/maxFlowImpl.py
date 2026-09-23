@@ -2,23 +2,23 @@ import networkx as nx
 from augmentPathImpl import augmentPath
 from typing import Any
 
-#TODO: rewrite implementation so that nodeLabels works with no list but rather a dictionary for non integer node keys
 
 def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[int, int]]:
     nodeLabels = { node: (-1, -1) for node in graph.nodes}
     nodeLabels[s] = (s, -1)
-    visited:set[int] = set()
+    visited:set[int] = set(s)
     queue = [s]
 
     while len(queue) > 0:
         #retrieving node from queue
         index:int = queue.pop(0)
-        visited.add(index)
         pred, currNode_flow = nodeLabels[index]
         #checking connected nodes
         for u, v, data in graph.out_edges(index, data=True):
             #discarding nodes already visited with label
             if v in visited:
+                continue
+            if data["capacity"] - data["flow"]:
                 continue
             new_flow = 0
             # s source case
@@ -29,6 +29,7 @@ def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[int, int]]:
                 new_flow = min(currNode_flow, data["capacity"] - data["flow"])
             #updating label for v
             nodeLabels[v] = (index, new_flow)
+            visited.add(v)
             queue.append(v)
             
     return nodeLabels
@@ -77,6 +78,8 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0
     for u,v,data in workingGraph.in_edges(t, data= True):
+        if data["isResidualEdge"]:
+            continue
         maxFlowValue+= data["flow"]
 
     return maxFlowValue, workingGraph
