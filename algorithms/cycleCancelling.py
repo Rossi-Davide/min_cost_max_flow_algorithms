@@ -20,10 +20,13 @@ def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
         if "capacity" not in R[u][v]:
             R[u][v]["capacity"] = 0
 
+
     #creating reverse edges if non existent
     for u,v in R.edges:
         if (not R.has_edge(v, u)) and R[u][v]["flow"] > 0:
             R.add_edge(v, u, capacity=0, flow= -R[u][v]["flow"], isResidualEdge = True)
+            if R[u][v].get("cost", False):
+                R[v][u]["cost"] = -R[u][v]["cost"]
 
     #removing saturated edges
     toDelete: list[tuple[Any,Any]] = []
@@ -34,7 +37,7 @@ def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
     for u,v in toDelete:
         R.remove_edge(u,v)
-
+        
     return R
 
 def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
@@ -58,7 +61,7 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
     workingGraph.add_node("t")
     for node, request in requests:
-        workingGraph.add_edge("t",node,capacity=-request, flow = 0, cost = 0)
+        workingGraph.add_edge(node,"t",capacity=-request, flow = 0, cost = 0)
 
     maxFlowValue, workingGraph = maxFlow(workingGraph,"s","t")
 
@@ -83,17 +86,8 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
     while True:
         residual = buildResidualGraph(workingGraph)
 
-        #updating residual graph with cost
-        for u,v in residual.edges:
-            if residual[u][v]["isResidualEdge"]:
-                residual[u][v]["cost"] = -workingGraph[v][u]["cost"]
-            else:
-                residual[u][v]["cost"] = workingGraph[u][v]["cost"]
-
         #detect negative cycle
         negativeLoop: list[Any] = bellmanFordNegativeCycleDetection(residual)
-        negativeLoop.append(negativeLoop[0])
-        loopEdges: list[tuple[Any,Any]] = [(negativeLoop[i],negativeLoop[i+1]) for i in range(len(negativeLoop)-1)]
 
         #optimal solution reached
         if len(negativeLoop) == 0:
@@ -101,10 +95,12 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
             for u,v in workingGraph.edges:
                 totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
             return workingGraph, totCost
+        
+        negativeLoop.append(negativeLoop[0])
+        loopEdges: list[tuple[Any,Any]] = [(negativeLoop[i],negativeLoop[i+1]) for i in range(len(negativeLoop)-1)]
 
         #find flow augment value in negative cycle
-
-        #setting initial flow value to the residual capacity in the first edge of the cycle
+        #setting initial flow value to the residual capacity of the first edge of the cycle
         flowValue : int = residual[loopEdges[0][0]] [loopEdges[0][1]] ["capacity"] - residual[loopEdges[0][0]] [loopEdges[0][1]] ["flow"]
 
         for u,v in loopEdges:
