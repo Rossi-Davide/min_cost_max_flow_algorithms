@@ -3,6 +3,7 @@ from typing import Any
 
 def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[Any]:
 
+    #node: (predecessor, cost)
     nodeLabels: dict[Any, tuple[Any | None, int]] = {
         node: (None, 0) for node in graph.nodes
     }
@@ -22,6 +23,10 @@ def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[Any]:
     if vertex is None:
         return []
 
+    for _ in range(graph.number_of_nodes()):
+        pred, cost = nodeLabels[vertex]
+        if pred is not None:
+            vertex = pred
 
     negativeLoop:list[Any] = [vertex]
 
