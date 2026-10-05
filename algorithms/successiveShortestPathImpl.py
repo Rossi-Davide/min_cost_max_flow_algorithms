@@ -20,6 +20,8 @@ def successiveShortestPath(graph:nx.DiGraph):
         k = E.pop()
         l = D.pop()
         workingGraph = dijkstra(k, workingGraph)
+        if graph.nodes[l]["predecessor"] is None:
+            continue
         for node in workingGraph.nodes:
             node["potential"] -= node["dist"]
         #find flow increase value in path from k to l
@@ -29,8 +31,8 @@ def successiveShortestPath(graph:nx.DiGraph):
         while currNode != k:
             pathNodes.insert(0,currNode)
             pred = graph.nodes[currNode]["predecessor"]
-            residual = graph[pred][currNode]["capacity"] - graph[pred][currNode]["flow"]
-            flowValue = min(flowValue, residual)
+            residualCap = graph[pred][currNode]["capacity"] - graph[pred][currNode]["flow"]
+            flowValue = min(flowValue, residualCap)
             currNode = pred
         pathNodes.insert(0,k)
         #augmentPath
