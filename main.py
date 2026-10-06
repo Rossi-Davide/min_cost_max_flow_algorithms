@@ -1,32 +1,19 @@
 import networkx as nx
 from algorithms.maxFlowImpl import maxFlow
+from loadFromFile import load_directed_graph
 
 if __name__ != "__main__":
-    exit
+    exit()
 
-s = 0
-t = 4
-
-capacities = [
-    [0, 3, 1, 0, 3],
-    [0, 0, 2, 0, 0],
-    [0, 0, 0, 1, 6],
-    [0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0],
-]
-
-costs = [
-    [0, 1, 0, 0, 2],
-    [0, 0, 0, 3, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0],
-]
-
-G = nx.DiGraph()
-for i in range(len(capacities)):
-    for j in range(len(capacities[i])):
-        G.add_edge(i, j, capacity=capacities[i][j], cost=costs[i][j])
-
-print("Nodes:", list(G.nodes()))
-print("Edges:", list(G.edges(data=True)))
+graph = load_directed_graph("graph_1_simple.txt", separator=" ")
+if graph is None:
+    raise RuntimeError("Unsuccessful parsing of file")
+#parse string values to int
+for node in graph.nodes:
+    if graph.nodes[node].get("bValue",False) and graph.nodes[node]["bValue"].isdigit():
+        graph.nodes[node]["bValue"] = int(graph.nodes[node]["bValue"])
+for u, v, data in graph.edges(data=True):
+    if data.get("capacity", False):
+        data["capacity"] = int(data["capacity"])
+    if data.get("cost", False):
+        data["cost"] = int(data["cost"])

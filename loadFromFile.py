@@ -4,6 +4,7 @@ def load_directed_graph(filepath: str, separator:str) -> nx.DiGraph | None:
     """
     Reads a directed graph from given filepath using given separator. 
     Returns a directed nx graph if operation is successful or None if it there are problems. 
+    By default, all labels and values are considered strings
 
     File is expected to be in the following format:
 
