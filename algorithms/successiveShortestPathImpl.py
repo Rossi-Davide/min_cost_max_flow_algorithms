@@ -8,35 +8,43 @@ def successiveShortestPath(graph:nx.DiGraph):
     D:set = set()
 
     for node in workingGraph.nodes:
-        node["x"] = 0
-        node["potential"] = 0
-        node["e"] = node["bValue"]
-        if node["e"] > 0:
+        workingGraph.nodes[node]["x"] = 0
+        workingGraph.nodes[node]["potential"] = 0
+        workingGraph.nodes[node]["e"] = workingGraph.nodes[node]["bValue"]
+        if workingGraph.nodes[node]["e"] > 0:
             E.add(node)
-        elif node["e"] < 0:
+        elif workingGraph.nodes[node]["e"] < 0:
             D.add(node)
 
     while len(E) > 0:
         k = E.pop()
         l = D.pop()
         workingGraph = dijkstra(k, workingGraph)
+        #TODO: correct implementation of edge case causing termination of the algorithm
         if graph.nodes[l]["predecessor"] is None:
             continue
         for node in workingGraph.nodes:
-            node["potential"] -= node["dist"]
+            workingGraph.nodes[node]["potential"] -= workingGraph.nodes[node]["dist"]
         #find flow increase value in path from k to l
-        flowValue = min(-graph.nodes[l]["e"], graph.nodes[k]["e"])
+
+        #set initial value
+        flowValue = min(-workingGraph.nodes[l]["e"], workingGraph.nodes[k]["e"])
         pathNodes = []
         currNode = l
+        #traverse the path from l to k 
         while currNode != k:
+            #append node at the top of the list
             pathNodes.insert(0,currNode)
-            pred = graph.nodes[currNode]["predecessor"]
-            residualCap = graph[pred][currNode]["capacity"] - graph[pred][currNode]["flow"]
+            pred = workingGraph.nodes[currNode]["predecessor"]
+            #compute residual capacity and update flow value
+            residualCap = workingGraph[pred][currNode]["capacity"] - workingGraph[pred][currNode]["flow"]
             flowValue = min(flowValue, residualCap)
             currNode = pred
         pathNodes.insert(0,k)
-        #augmentPath
+        #augment Path using the flow value found
         workingGraph = augmentPath(workingGraph,pathNodes,flowValue)
+
+
         
 
     
