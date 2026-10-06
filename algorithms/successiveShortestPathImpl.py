@@ -19,14 +19,19 @@ def successiveShortestPath(graph:nx.DiGraph):
 
     while len(E) > 0:
         k = E.pop()
-        l = D.pop()
+        l = None
         #building residual graph with no saturated edges from main graph
         residualGraph = buildResidualGraph(workingGraph)
         #running dijkstra with reduced costs on residual graph
         residualGraph = dijkstra(k, residualGraph)
-        #TODO: correct implementation of edge case causing termination of the algorithm
-        if graph.nodes[l]["predecessor"] is None:
-            continue
+        for label in D:
+            if residualGraph.nodes[label]["dist"] < float('inf'):
+                l = label
+                break
+        if l is None:
+            raise ValueError("""The given graph is not a valid graph for max-flow 
+            min-cost algorithms because there 
+            is a source node with unmet demand""")
         #update potential values in the main graph
         for node in residualGraph.nodes:
             workingGraph.nodes[node]["potential"] -= residualGraph.nodes[node]["dist"]
