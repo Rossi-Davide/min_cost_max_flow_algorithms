@@ -34,7 +34,8 @@ def successiveShortestPath(graph:nx.DiGraph):
             is a source node with unmet demand""")
         #update potential values in the main graph
         for node in residualGraph.nodes:
-            workingGraph.nodes[node]["potential"] -= residualGraph.nodes[node]["dist"]
+            if residualGraph.nodes[node]["dist"] < float('inf'):
+                workingGraph.nodes[node]["potential"] -= residualGraph.nodes[node]["dist"]
         
         #find flow increase value in path from k to l
         #set initial value
