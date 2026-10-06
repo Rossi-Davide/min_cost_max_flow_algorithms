@@ -43,7 +43,12 @@ def successiveShortestPath(graph:nx.DiGraph):
         pathNodes.insert(0,k)
         #augment Path using the flow value found
         workingGraph = augmentPath(workingGraph,pathNodes,flowValue)
-
+        workingGraph.nodes[k]["e"] -= flowValue
+        if workingGraph.nodes[k]["e"] > 0:
+            E.add(k)
+        workingGraph.nodes[l]["e"] += flowValue
+        if workingGraph.nodes[l]["e"] < 0:
+            D.add(l)
 
         
 
