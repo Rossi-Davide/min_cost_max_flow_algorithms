@@ -1,5 +1,5 @@
 import networkx as nx
-from augmentPathImpl import augmentPath
+from algorithms.augmentPathImpl import augmentPath
 from typing import Any
 
 
