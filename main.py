@@ -5,7 +5,7 @@ from loadFromFile import load_directed_graph
 if __name__ != "__main__":
     exit()
 
-graph = load_directed_graph("graph_1_simple.txt", separator=" ")
+graph = load_directed_graph("graphs/graph_1_simple.txt", separator=" ")
 if graph is None:
     raise RuntimeError("Unsuccessful parsing of file")
 #parse string values to int
@@ -17,3 +17,7 @@ for u, v, data in graph.edges(data=True):
         data["capacity"] = int(data["capacity"])
     if data.get("cost", False):
         data["cost"] = int(data["cost"])
+
+print(f"Loaded graph: {graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges")
+print("Nodes:", list(graph.nodes(data=True)))
+print("Edges:", list(graph.edges(data=True)))
