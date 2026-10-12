@@ -9,7 +9,7 @@ def augmentPath(graph:nx.DiGraph, nodes: list[Any], augmFlow: int) -> nx.DiGraph
         graph.edges[u,v]["flow"] = graph.edges[u,v]["flow"] + augmFlow
         
         #creating reverse edge if non existent
-        if not graph.has_edge(v, u) or (not graph[v][u]["isResidualEdge"]):
+        if not graph.has_edge(v, u) or (not graph[v][u].get("isResidualEdge",False)):
             graph.add_edge(v, u, capacity=0, flow=0, isResidualEdge = True)
             #updating cost if present in original graph
             if graph.edges[u,v].get("cost",False):

@@ -3,32 +3,29 @@ from algorithms.augmentPathImpl import augmentPath
 from typing import Any
 
 
-def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[int, int]]:
-    nodeLabels = { node: (-1, -1) for node in graph.nodes}
-    nodeLabels[s] = (s, -1)
-    visited:set[int] = set(s)
+def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[Any, float]]:
+    nodeLabels = { node: (None, float('inf')) for node in graph.nodes}
+    nodeLabels[s] = (s, float('inf'))
+    visited: set[Any] = {s}
     queue = [s]
 
     while len(queue) > 0:
         #retrieving node from queue
-        index:int = queue.pop(0)
-        pred, currNode_flow = nodeLabels[index]
+        node = queue.pop(0)
+        pred, currNode_flow = nodeLabels[node]
         #checking connected nodes
-        for u, v, data in graph.out_edges(index, data=True):
+        for u, v, data in graph.out_edges(node, data=True):
             #discarding nodes already visited with label
             if v in visited:
                 continue
-            if data["capacity"] - data["flow"]:
+            if data["capacity"] == data["flow"]:
                 continue
             new_flow = 0
-            # s source case
-            if currNode_flow < 0:
-                new_flow = data["capacity"] - data["flow"]
-            else:
-                #calculating flow value towards v, capacity- flow works for both direct and reverse edges
-                new_flow = min(currNode_flow, data["capacity"] - data["flow"])
+            #calculating flow value towards v, capacity- flow works for both direct and reverse edges
+            new_flow = min(currNode_flow, data["capacity"] - data["flow"])
             #updating label for v
-            nodeLabels[v] = (index, new_flow)
+            nodeLabels[v] = (node, new_flow)
+            #label set for v, therefore already visited
             visited.add(v)
             queue.append(v)
             
@@ -58,23 +55,23 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
         #first predecessor and bottleneck value (the flow gain in this iteration)
         firstPred, augmFlow = nodeLabels[t]
         #no new augmenting path found, algorithm stops for optimality condition
-        if firstPred == -1:
+        if firstPred is None:
             optimalState = True
             continue
 
         #reversely crossing the augmenting path and updating flow for each edge
-        nodePath = [t]
-        pred, flow = nodeLabels[t]
-        endReverseTraversal = False
-        while not endReverseTraversal:
-            nodePath.append(pred)
-            next_pred, flow = nodeLabels[pred]
-            if pred == next_pred:
-                endReverseTraversal = True
-            pred = next_pred
+        nodePath = []
+        current = t
+        pred = None
+        while True:
+            nodePath.append(current)
+            pred, flow = nodeLabels[current]
+            if current == pred:
+                break
+            current = pred
 
         nodePath.reverse()
-        workingGraph = augmentPath(workingGraph,nodePath,augmFlow)
+        workingGraph = augmentPath(workingGraph,nodePath,int(augmFlow))
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0
     for u,v,data in workingGraph.in_edges(t, data= True):

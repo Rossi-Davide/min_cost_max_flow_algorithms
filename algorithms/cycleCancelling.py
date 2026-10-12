@@ -19,16 +19,30 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
         elif data["bValue"] < 0:
             requests.append((node,data["bValue"]))
 
-    #adding s and t to maxFlow graph
-    workingGraph.add_node("s")
+    #PREPARING GRAPH FOR MAXFLOW ALGORITHM
+
+    #adding s and t nodes to maxFlow graph
+    sourceNode = "s"
+    suffix = 1
+    #checking that there's no node with the same name already in the graph
+    while sourceNode in workingGraph:
+        sourceNode = f"s_{suffix}"
+        suffix += 1
+    workingGraph.add_node(sourceNode)
     for node, availability in availabilities:
-        workingGraph.add_edge("s",node,capacity=availability, flow = 0, cost = 0)
+        workingGraph.add_edge(sourceNode,node,capacity=availability, flow = 0, cost = 0)
 
-    workingGraph.add_node("t")
+    sinkNode = "t"
+    suffix = 1
+    #checking that there's no node with the same name already in the graph
+    while sinkNode in workingGraph:
+        sinkNode = f"t_{suffix}"
+        suffix += 1
+    workingGraph.add_node(sinkNode)
     for node, request in requests:
-        workingGraph.add_edge(node,"t",capacity=-request, flow = 0, cost = 0)
+        workingGraph.add_edge(node,sinkNode,capacity=-request, flow = 0, cost = 0)
 
-    maxFlowValue, workingGraph = maxFlow(workingGraph,"s","t")
+    maxFlowValue, workingGraph = maxFlow(workingGraph,sourceNode,sinkNode)
 
     expectedFlow = 0
     #checking flow correctness
@@ -45,8 +59,10 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
         return None, 0
 
     #cleaning graph after max flow
-    workingGraph.remove_node("s")
-    workingGraph.remove_node("t")
+    workingGraph.remove_node(sourceNode)
+    workingGraph.remove_node(sinkNode)
+
+    #CYCLE CANCELLING 
 
     while True:
         residual = buildResidualGraph(workingGraph)
