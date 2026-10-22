@@ -59,7 +59,7 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
             optimalState = True
             continue
 
-        #reversely crossing the augmenting path and updating flow for each edge
+        #reversely crossing the augmenting path
         nodePath = []
         current = t
         pred = None
