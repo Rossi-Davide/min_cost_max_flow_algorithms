@@ -1,6 +1,6 @@
 import networkx as nx
-from algorithms.maxFlowImpl import maxFlow
 from loadFromFile import load_directed_graph
+from algorithms.cycleCancelling import cycleCancelling
 
 if __name__ != "__main__":
     exit()
@@ -10,7 +10,7 @@ if graph is None:
     raise RuntimeError("Unsuccessful parsing of file")
 #parse string values to int
 for node in graph.nodes:
-    if graph.nodes[node].get("bValue",False) and graph.nodes[node]["bValue"].isdigit():
+    if graph.nodes[node].get("bValue",False):
         graph.nodes[node]["bValue"] = int(graph.nodes[node]["bValue"])
 for u, v, data in graph.edges(data=True):
     if data.get("capacity", False):
@@ -18,6 +18,29 @@ for u, v, data in graph.edges(data=True):
     if data.get("cost", False):
         data["cost"] = int(data["cost"])
 
+def print_graph_summary(label, graph):
+    print(f"\n{label}")
+    print(f"  Nodes: {graph.number_of_nodes()}")
+    print(f"  Edges: {graph.number_of_edges()}")
+    print("  Node details:")
+    for node, attrs in graph.nodes(data=True):
+        print(f"    - {node}: {attrs}")
+    print("  Edge details:")
+    for u, v, attrs in graph.edges(data=True):
+        print(f"    - {u} -> {v}: {attrs}")
+
 print(f"Loaded graph: {graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges")
-print("Nodes:", list(graph.nodes(data=True)))
-print("Edges:", list(graph.edges(data=True)))
+print_graph_summary("Original graph", graph)
+
+print(f'Running cycle cancelling algorithm')
+cycle_cancelling_graph, cost = cycleCancelling(graph)
+if cycle_cancelling_graph is None:
+    print("Error while running cycle cancelling algorithm")
+else:
+    print(f'Cost from cycle cancelling solution: {cost}')
+    print_graph_summary("Cycle cancelling graph", cycle_cancelling_graph)
+
+
+#TODO: build residualGraph from scratch computing residual capacity
+#TODO: build augmentPath from scratch ignoring addition of reverse edges
+#TODO: adapt algorithms
