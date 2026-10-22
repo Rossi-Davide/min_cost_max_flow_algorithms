@@ -74,7 +74,8 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
         if len(negativeLoop) == 0:
             totCost = 0
             for u,v in workingGraph.edges:
-                totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
+                if not workingGraph[u][v].get("isResidualEdge", False):
+                    totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
             return workingGraph, totCost
         
         negativeLoop.append(negativeLoop[0])
