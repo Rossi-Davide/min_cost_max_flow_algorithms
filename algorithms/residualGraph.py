@@ -7,31 +7,16 @@ Each edge has properties: flow,capacity,isResidualEdge
 """
 def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
-    R = graph.copy()
+    R = nx.DiGraph()
+    R.add_nodes_from(graph.nodes)
 
     #setting flow and capacity for each edge
-    for u, v in R.edges:
-        if "flow" not in R[u][v]:
-            R[u][v]["flow"] = 0
-        if "capacity" not in R[u][v]:
-            R[u][v]["capacity"] = 0
-
-
-    #creating reverse edges if non existent
-    for u,v in R.edges:
-        if (not R.has_edge(v, u)) and R[u][v]["flow"] > 0:
-            R.add_edge(v, u, capacity=0, flow= -R[u][v]["flow"], isResidualEdge = True)
-            if R[u][v].get("cost", False):
-                R[v][u]["cost"] = -R[u][v]["cost"]
-
-    #removing saturated edges
-    toDelete: list[tuple[Any,Any]] = []
-
-    for u,v in R.edges:
-        if R[u][v]["flow"] == R[u][v]["capacity"]:
-            toDelete.append((u,v))
-
-    for u,v in toDelete:
-        R.remove_edge(u,v)
-        
+    for u, v in graph.edges:
+        if graph[u][v]["capacity"] - graph[u][v]["flow"] > 0:
+            R.add_edge(u,v,capacity=graph[u][v]["capacity"] - graph[u][v]["flow"], flow=0)
+        if graph[u][v]["flow"] > 0:
+            R.add_edge(v,u,capacity=0,flow=-graph[u][v]["flow"], isReverseEdge=True)
+        if graph[u][v].get("cost", 0) > 0:
+            R[u][v]["cost"] = graph[u][v]["cost"]
+            R[v][u]["cost"] = -graph[u][v]["cost"]
     return R
