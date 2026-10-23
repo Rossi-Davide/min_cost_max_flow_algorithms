@@ -1,6 +1,7 @@
 import networkx as nx
 from algorithms.augmentPathImpl import augmentPath
 from typing import Any
+from .residualGraph import buildResidualGraph
 
 
 def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[Any, float]]:
@@ -13,7 +14,7 @@ def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[Any, float]]:
         #retrieving node from queue
         node = queue.pop(0)
         pred, currNode_flow = nodeLabels[node]
-        #checking connected nodes
+        #checking if connected nodes already have a label
         for u, v, data in graph.out_edges(node, data=True):
             #discarding nodes already visited with label
             if v in visited:
@@ -22,7 +23,7 @@ def augmentPathBFS(graph: nx.DiGraph, s) -> dict[Any,tuple[Any, float]]:
                 continue
             new_flow = 0
             #calculating flow value towards v, capacity- flow works for both direct and reverse edges
-            new_flow = min(currNode_flow, data["capacity"] - data["flow"])
+            new_flow = min(currNode_flow, data["capacity"])
             #updating label for v
             nodeLabels[v] = (node, new_flow)
             #label set for v, therefore already visited
@@ -49,8 +50,9 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
 
 
     while not optimalState:
+        R = buildResidualGraph(workingGraph)
         #find augmenting path towards every other node with BFS visit
-        nodeLabels = augmentPathBFS(workingGraph,s)
+        nodeLabels = augmentPathBFS(R,s)
 
         #first predecessor and bottleneck value (the flow gain in this iteration)
         firstPred, augmFlow = nodeLabels[t]
@@ -71,12 +73,11 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
             current = pred
 
         nodePath.reverse()
-        workingGraph = augmentPath(workingGraph,nodePath,int(augmFlow))
+        edges_path: list[tuple[Any,Any, bool]] = [(nodePath[i],nodePath[i+1], R[nodePath[i]][nodePath[i+1]]["isReverseEdge"]) for i in range(len(nodePath)-1)]
+        workingGraph = augmentPath(workingGraph,edges_path,int(augmFlow))
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0
     for u,v,data in workingGraph.in_edges(t, data= True):
-        if data.get("isResidualEdge",False):
-            continue
         maxFlowValue+= data["flow"]
 
     return maxFlowValue, workingGraph
