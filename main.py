@@ -1,11 +1,17 @@
 import networkx as nx
+import argparse
 from loadFromFile import load_directed_graph
 from algorithms.cycleCancelling import cycleCancelling
 
 if __name__ != "__main__":
     exit()
 
-graph = load_directed_graph("graphs/graph_4_simple.txt", separator=" ")
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--graph', required=True)
+args = parser.parse_args()
+
+graph = load_directed_graph(args.graph, separator=" ")
 if graph is None:
     raise RuntimeError("Unsuccessful parsing of file")
 #parse string values to int
