@@ -1,4 +1,7 @@
 import networkx as nx
+from pathlib import Path
+
+GRAPH_DIR = Path(__file__).parent / "graphs"
 
 def load_directed_graph(filepath: str, separator:str) -> nx.DiGraph | None:
     """
@@ -23,7 +26,9 @@ def load_directed_graph(filepath: str, separator:str) -> nx.DiGraph | None:
     """
     G = nx.DiGraph()
 
-    with open(filepath,"r") as f:
+    path = GRAPH_DIR / filepath
+
+    with open(path,"r") as f:
         #read formatting of node lines and attributes
         node_format = f.readline()
         node_format = node_format.strip()

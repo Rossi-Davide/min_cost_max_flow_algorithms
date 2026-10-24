@@ -2,6 +2,7 @@ import networkx as nx
 import argparse
 from loadFromFile import load_directed_graph
 from algorithms.cycleCancelling import cycleCancelling
+from algorithms.successiveShortestPathImpl import successiveShortestPath
 
 if __name__ != "__main__":
     exit()
@@ -45,3 +46,11 @@ if cycle_cancelling_graph is None:
 else:
     print(f'Cost from cycle cancelling solution: {cost}')
     print_graph_summary("Cycle cancelling graph", cycle_cancelling_graph)
+
+print(f'Running successive shortest path algorithm')
+ssp_graph, cost = successiveShortestPath(graph)
+if ssp_graph is None:
+    print("Error while running successive shortest path algorithm")
+else:
+    print(f'Cost from successive shortest path solution: {cost}')
+    print_graph_summary("Successive shortest path graph", ssp_graph)
