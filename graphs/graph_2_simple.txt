@@ -1,0 +1,16 @@
+nodes bValue
+edges capacity cost
+n S1 15
+n S2 10
+n T1 0
+n T2 0
+n K1 -12
+n K2 -13
+e S1 T1 10 2
+e S1 T2 8 5
+e S2 T1 6 3
+e S2 T2 12 1
+e T1 K1 8 4
+e T1 K2 7 2
+e T2 K1 6 1
+e T2 K2 9 6
