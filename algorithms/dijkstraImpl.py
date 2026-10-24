@@ -9,8 +9,8 @@ storing the distance and predecessor in each node of the graph
 def dijkstra(source, graph:nx.DiGraph) -> nx.DiGraph:
     #preparing graph and structures
     for node in graph.nodes:
-        node["dist"] = float('inf')
-        node["predecessor"] = None
+        graph.nodes[node]["dist"] = float('inf')
+        graph.nodes[node]["predecessor"] = None
     graph.nodes[source]["dist"] = 0
     heap = []
     heapify(heap)

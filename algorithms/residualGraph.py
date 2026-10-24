@@ -8,6 +8,14 @@ Each edge has properties: flow,capacity,isResidualEdge
 def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
 
     R = nx.DiGraph()
+    for node in graph.nodes:
+        R.add_node(node)
+        if 'x' in graph.nodes[node]:
+            R.nodes[node]['x'] = graph.nodes[node]['x']
+        if 'e' in graph.nodes[node]:
+            R.nodes[node]['e'] = graph.nodes[node]['e']
+        if 'potential' in graph.nodes[node]:
+            R.nodes[node]['potential'] = graph.nodes[node]['potential']
     R.add_nodes_from(graph.nodes)
 
     #setting flow and capacity for each edge
