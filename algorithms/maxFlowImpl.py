@@ -73,7 +73,7 @@ def maxFlow(graph: nx.DiGraph, s, t) -> tuple[int, nx.DiGraph]:
             current = pred
 
         nodePath.reverse()
-        edges_path: list[tuple[Any,Any, bool]] = [(nodePath[i],nodePath[i+1], R[nodePath[i]][nodePath[i+1]]["isReverseEdge"]) for i in range(len(nodePath)-1)]
+        edges_path: list[tuple[Any,Any, bool]] = [(nodePath[i],nodePath[i+1], R[nodePath[i]][nodePath[i+1]].get("isReverseEdge",False)) for i in range(len(nodePath)-1)]
         workingGraph = augmentPath(workingGraph,edges_path,int(augmFlow))
     #max flow equals to the sum of flow into t, the sink
     maxFlowValue = 0

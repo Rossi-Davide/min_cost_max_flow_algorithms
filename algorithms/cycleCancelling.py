@@ -74,20 +74,23 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
         if len(negativeLoop) == 0:
             totCost = 0
             for u,v in workingGraph.edges:
-                if not workingGraph[u][v].get("isResidualEdge", False):
-                    totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
+                totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
             return workingGraph, totCost
         
         negativeLoop.append(negativeLoop[0])
-        loopEdges: list[tuple[Any,Any]] = [(negativeLoop[i],negativeLoop[i+1]) for i in range(len(negativeLoop)-1)]
+        loopEdges: list[tuple[Any,Any, bool]] = [(negativeLoop[i],negativeLoop[i+1], residual[negativeLoop[i]][negativeLoop[i+1]].get("isReverseEdge",False)) for i in range(len(negativeLoop)-1)]
 
         #find flow augment value in negative cycle
         #setting initial flow value to the residual capacity of the first edge of the cycle
         flowValue : int = residual[loopEdges[0][0]] [loopEdges[0][1]] ["capacity"] - residual[loopEdges[0][0]] [loopEdges[0][1]] ["flow"]
 
-        for u,v in loopEdges:
-            flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
+        for u,v, isReverseEdge in loopEdges:
+            #if reverse edge take the flow reduction value as flow value to push
+            if isReverseEdge:
+                flowValue = min(flowValue, -residual[u][v]["flow"])
+            else:
+                flowValue = min(flowValue, residual[u][v]["capacity"])
                     
         # augment flow in graph
-        workingGraph = augmentPath(workingGraph,negativeLoop,flowValue)
+        workingGraph = augmentPath(workingGraph,loopEdges,flowValue)
     

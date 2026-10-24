@@ -5,7 +5,7 @@ from algorithms.cycleCancelling import cycleCancelling
 if __name__ != "__main__":
     exit()
 
-graph = load_directed_graph("graphs/graph_1_simple.txt", separator=" ")
+graph = load_directed_graph("graphs/graph_4_simple.txt", separator=" ")
 if graph is None:
     raise RuntimeError("Unsuccessful parsing of file")
 #parse string values to int
@@ -39,8 +39,3 @@ if cycle_cancelling_graph is None:
 else:
     print(f'Cost from cycle cancelling solution: {cost}')
     print_graph_summary("Cycle cancelling graph", cycle_cancelling_graph)
-
-
-#TODO: build residualGraph from scratch computing residual capacity
-#TODO: build augmentPath from scratch ignoring addition of reverse edges
-#TODO: adapt algorithms
