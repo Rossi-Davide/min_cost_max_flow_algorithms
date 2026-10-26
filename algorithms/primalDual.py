@@ -90,6 +90,8 @@ def primal_dual(graph: nx.DiGraph) -> tuple[nx.DiGraph,int]:
             workingGraph[u][v]["flow"] = maxFlowGraph[u][v]["flow"]
         #setting outgoing offer as max flow value flowing from s -> t
         outgoing_offer = flowValue
+    #removing artificial source and sink
+    workingGraph.remove_nodes_from([sourceNode,sinkNode])
     #calculating total cost
     totCost = 0
     for u,v in workingGraph.edges:
