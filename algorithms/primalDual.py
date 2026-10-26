@@ -71,6 +71,11 @@ def primal_dual(graph: nx.DiGraph) -> tuple[nx.DiGraph,int]:
         as_graph = a_graph(workingGraph)
         #calculate maxflow on admissive graph, the admissive graph might contain edges with flow from previous maxflow iterations
         flowValue, maxFlowGraph = maxFlow(as_graph, sourceNode, sinkNode)
+        if flowValue == 0:
+            raise ValueError("""
+            The given graph is not a valid graph because it's not possible to push further flow
+            although there are still nodes with unmet demand
+            """)
 
         #updating flow value in main working graph
         """ 
