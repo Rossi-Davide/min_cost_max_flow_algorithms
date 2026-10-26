@@ -11,7 +11,6 @@ def successiveShortestPath(graph:nx.DiGraph) -> tuple[nx.DiGraph,int]:
     D:set = set()
 
     for node in workingGraph.nodes:
-        workingGraph.nodes[node]["x"] = 0
         workingGraph.nodes[node]["potential"] = 0
         workingGraph.nodes[node]["e"] = workingGraph.nodes[node]["bValue"]
         if workingGraph.nodes[node]["e"] > 0:
@@ -29,14 +28,17 @@ def successiveShortestPath(graph:nx.DiGraph) -> tuple[nx.DiGraph,int]:
         residualGraph = buildResidualGraph(workingGraph)
         #running dijkstra with reduced costs on residual graph
         residualGraph = dijkstra(k, residualGraph)
+        #check if any destination nodes are reachable
         for dest_node in D:
             if residualGraph.nodes[dest_node]["dist"] < float('inf'):
                 l = dest_node
                 break
         if l is None:
-            raise ValueError("""The given graph is not a valid graph for max-flow 
-            min-cost algorithms because there 
-            is a source node with unmet demand""")
+            raise ValueError("""
+The given graph is not a valid graph for max-flow 
+min-cost algorithms because there 
+is a source node with unmet demand
+""")
         D.remove(l)
         #update potential values in the main graph
         for node in residualGraph.nodes:
@@ -44,17 +46,14 @@ def successiveShortestPath(graph:nx.DiGraph) -> tuple[nx.DiGraph,int]:
                 workingGraph.nodes[node]["potential"] -= residualGraph.nodes[node]["dist"]
         
         #find flow increase value in path from k to l
-        #set initial value
         flowValue = min(-residualGraph.nodes[l]["e"], residualGraph.nodes[k]["e"])
         pathNodes = []
         currNode = l
-        #traverse the path from l to k 
+        #traverse the path from k to l reversely
         while currNode != k:
-            #append node at the top of the list
             pred = residualGraph.nodes[currNode]["predecessor"]
-            #compute residual capacity and update flow value
-            residualCap = residualGraph[pred][currNode]["capacity"] - residualGraph[pred][currNode]["flow"]
-            flowValue = min(flowValue, residualCap)
+            #update flow value
+            flowValue = min(flowValue, residualGraph[pred][currNode]["capacity"] - residualGraph[pred][currNode]["flow"])
             pathNodes.append(currNode)
             currNode = pred
         pathNodes.append(k)

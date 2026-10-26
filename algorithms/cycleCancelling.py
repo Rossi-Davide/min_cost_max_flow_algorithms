@@ -9,7 +9,7 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
     workingGraph = graph.copy()
 
-    #memorizing all the nodes with bi > 0 or bi < 0
+    #storing all nodes with bi > 0 or bi < 0
     availabilities:list[tuple[Any,int]] = []
     requests:list[tuple[Any,int]] = []
 
@@ -44,19 +44,22 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
     maxFlowValue, workingGraph = maxFlow(workingGraph,sourceNode,sinkNode)
 
+    # compute expected max flow
     expectedFlow = 0
-    #checking flow correctness
     for node, value in availabilities:
         expectedFlow += value
 
     """
-    To have a valid start solution all out edges from
+    To have a valid start solution all outer edges from
     source must be saturated. Therefore the max flow value shall be equal to 
     the sum of all maximum capacities
     of the outgoing edges from the node s, which is equal to the sum of all bi positive values in the original graph
     """
-    if maxFlowValue < expectedFlow:
-        return None, 0
+    if maxFlowValue != expectedFlow:
+        raise ValueError("""
+The given graph is not admissible for the min cost problem because
+not all source node are able to flow their total availability to sink nodes 
+""")
 
     #cleaning graph after max flow
     workingGraph.remove_node(sourceNode)
@@ -72,6 +75,7 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
 
         #optimal solution reached
         if len(negativeLoop) == 0:
+            #compute total cost
             totCost = 0
             for u,v in workingGraph.edges:
                 totCost += workingGraph[u][v]["cost"] * workingGraph[u][v]["flow"]
@@ -84,12 +88,8 @@ def cycleCancelling(graph: nx.DiGraph) -> tuple[None | nx.DiGraph, int]:
         #setting initial flow value to the residual capacity of the first edge of the cycle
         flowValue : int = residual[loopEdges[0][0]] [loopEdges[0][1]] ["capacity"] - residual[loopEdges[0][0]] [loopEdges[0][1]] ["flow"]
 
-        for u,v, isReverseEdge in loopEdges:
-            #if reverse edge take the flow reduction value as flow value to push
-            if isReverseEdge:
-                flowValue = min(flowValue, -residual[u][v]["flow"])
-            else:
-                flowValue = min(flowValue, residual[u][v]["capacity"])
+        for u,v,_ in loopEdges:
+            flowValue = min(flowValue, residual[u][v]["capacity"] - residual[u][v]["flow"])
                     
         # augment flow in graph
         workingGraph = augmentPath(workingGraph,loopEdges,flowValue)

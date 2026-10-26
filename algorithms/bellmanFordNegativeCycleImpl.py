@@ -24,13 +24,13 @@ def bellmanFordNegativeCycleDetection(graph: nx.DiGraph) -> list[Any]:
     if vertex is None:
         return []
 
-    #reach source of loop
+    #reverse path to reach source of loop
     for _ in range(graph.number_of_nodes()):
         pred, cost = nodeLabels[vertex]
         if pred is not None:
             vertex = pred
 
-    #build negative loop
+    #build negative loop nodes list
     negativeLoop:list[Any] = [vertex]
 
     currNode = nodeLabels[vertex][0]

@@ -4,6 +4,11 @@ from .maxFlowImpl import maxFlow
 from .residualGraph import buildResidualGraph
 
 def a_graph(graph:nx.DiGraph) -> nx.DiGraph:
+    """
+    Build admissive graph, a graph whose nodes are the same of given graph
+    and only edges whose reduced cost is equal to 0 are added. 
+    For each added edge, capacity and flow are preserved as in input graph
+    """
     a_graph = nx.DiGraph()
     a_graph.add_nodes_from(graph)
     for u,v in graph.edges:
@@ -73,9 +78,9 @@ def primal_dual(graph: nx.DiGraph) -> tuple[nx.DiGraph,int]:
         flowValue, maxFlowGraph = maxFlow(as_graph, sourceNode, sinkNode)
         if flowValue == 0:
             raise ValueError("""
-            The given graph is not a valid graph because it's not possible to push further flow
-            although there are still nodes with unmet demand
-            """)
+The given graph is not a valid graph because it's not possible to push further flow
+although there are still nodes with unmet demand
+""")
 
         #updating flow value in main working graph
         """ 
