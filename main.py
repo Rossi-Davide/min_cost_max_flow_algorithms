@@ -41,27 +41,34 @@ print(f"Loaded graph: {graph.number_of_nodes()} nodes, {graph.number_of_edges()}
 print_graph_summary("Original graph", graph)
 
 print(f'Running cycle cancelling algorithm')
-cycle_cancelling_graph, cost = cycleCancelling(graph)
-if cycle_cancelling_graph is None:
-    print("Error while running cycle cancelling algorithm")
-else:
-    print(f'Cost from cycle cancelling solution: {cost}')
-    print_graph_summary("Cycle cancelling graph", cycle_cancelling_graph)
-"""
-print(f'Running successive shortest path algorithm')
-ssp_graph, cost = successiveShortestPath(graph)
-if ssp_graph is None:
-    print("Error while running successive shortest path algorithm")
-else:
-    print(f'Cost from successive shortest path solution: {cost}')
-    print_graph_summary("Successive shortest path graph", ssp_graph)
+try:
+    cycle_cancelling_graph, cost = cycleCancelling(graph)
+    if cycle_cancelling_graph is None:
+        print("Error while running cycle cancelling algorithm, returned graph is None")
+    else:
+        print(f'Cost from cycle cancelling solution: {cost}')
+        print_graph_summary("Cycle cancelling graph", cycle_cancelling_graph)
+except Exception as e:
+    print(e)
 
-"""
+print(f'Running successive shortest path algorithm')
+try:
+    ssp_graph, cost = successiveShortestPath(graph)
+    if ssp_graph is None:
+        print("Error while running successive shortest path algorithm, returned graph is None")
+    else:
+        print(f'Cost from successive shortest path solution: {cost}')
+        print_graph_summary("Successive shortest path graph", ssp_graph)
+except Exception as e:
+    print(e)
 
 print(f'Running primal dual algorithm')
-primal_dual_graph, cost = primal_dual(graph)
-if primal_dual_graph is None:
-    print("Error while running primal dual algorithm")
-else:
-    print(f'Cost from primal dual solution: {cost}')
-    print_graph_summary("Primal dual graph", primal_dual_graph)
+try:
+    primal_dual_graph, cost = primal_dual(graph)
+    if primal_dual_graph is None:
+        print("Error while running primal dual algorithm, returned graph is None")
+    else:
+        print(f'Cost from primal dual solution: {cost}')
+        print_graph_summary("Primal dual graph", primal_dual_graph)
+except Exception as e:
+    print(e)
