@@ -1,4 +1,3 @@
-import networkx as nx
 import argparse
 from loadFromFile import load_directed_graph
 from algorithms.cycleCancelling import cycleCancelling

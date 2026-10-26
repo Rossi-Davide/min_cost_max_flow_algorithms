@@ -3,10 +3,10 @@ from pathlib import Path
 
 GRAPH_DIR = Path(__file__).parent / "graphs"
 
-def load_directed_graph(filepath: str, separator:str) -> nx.DiGraph | None:
+def load_directed_graph(filename: str, separator:str) -> nx.DiGraph | None:
     """
-    Reads a directed graph from given filepath using given separator. 
-    Returns a directed nx graph if operation is successful or None if it there are problems. 
+    Reads a directed graph from given file using given separator. 
+    Returns a directed nx graph if operation is successful or None if there are problems. 
     By default, all labels and values are considered strings
 
     File is expected to be in the following format:
@@ -26,7 +26,7 @@ def load_directed_graph(filepath: str, separator:str) -> nx.DiGraph | None:
     """
     G = nx.DiGraph()
 
-    path = GRAPH_DIR / filepath
+    path = GRAPH_DIR / filename
 
     with open(path,"r") as f:
         #read formatting of node lines and attributes
