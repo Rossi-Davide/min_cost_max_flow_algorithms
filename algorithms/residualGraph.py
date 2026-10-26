@@ -24,7 +24,7 @@ def buildResidualGraph(graph: nx.DiGraph) -> nx.DiGraph:
             R.add_edge(u,v,capacity=graph[u][v]["capacity"] - graph[u][v]["flow"], flow=0)
         if graph[u][v]["flow"] > 0:
             R.add_edge(v,u,capacity=0,flow=-graph[u][v]["flow"], isReverseEdge=True)
-        if graph[u][v].get("cost", 0) > 0:
+        if graph[u][v].get("cost", -1) >= 0:
             if R.has_edge(u,v):
                 R[u][v]["cost"] = graph[u][v]["cost"]
             if R.has_edge(v,u):
