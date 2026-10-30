@@ -1,4 +1,6 @@
 import argparse
+import networkx as nx
+
 from loadFromFile import load_directed_graph
 from algorithms.cycleCancelling import cycleCancelling
 from algorithms.successiveShortestPathImpl import successiveShortestPath
@@ -71,3 +73,15 @@ try:
         print_graph_summary("Primal dual graph", primal_dual_graph)
 except Exception as e:
     print(e)
+
+def networkx_min_cost(graph):
+    """Min cost computed by NetworkX"""
+    nxGraph = nx.DiGraph()
+    for node, data in graph.nodes(data=True):
+        #the networkx implementation requires nodes have a demand which is the requested incoming flow
+        nxGraph.add_node(node, demand=-data.get("bValue", 0))
+    for u, v, data in graph.edges(data=True):
+        nxGraph.add_edge(u, v, capacity=data["capacity"], weight=data["cost"])
+    return nx.min_cost_flow_cost(nxGraph)
+
+print(f'Cost given from NetworkX library {networkx_min_cost(graph)}')
