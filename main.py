@@ -83,5 +83,7 @@ def networkx_min_cost(graph):
     for u, v, data in graph.edges(data=True):
         nxGraph.add_edge(u, v, capacity=data["capacity"], weight=data["cost"])
     return nx.min_cost_flow_cost(nxGraph)
-
-print(f'Cost given from NetworkX library {networkx_min_cost(graph)}')
+try:
+    print(f'Cost given from NetworkX library {networkx_min_cost(graph)}')
+except nx.NetworkXUnfeasible:
+    print('Graph is not admissible for the min cost max flow problem')
